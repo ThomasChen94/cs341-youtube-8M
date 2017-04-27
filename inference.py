@@ -111,7 +111,11 @@ def get_input_data_tensors(reader, data_pattern, batch_size, num_readers=1):
     return video_id_batch, video_batch, num_frames_batch
 
 def inference(reader, train_dir, data_pattern, out_file_location, batch_size, top_k):
-  with tf.Session(config=tf.ConfigProto(allow_soft_placement=True)) as sess, gfile.Open(out_file_location, "w+") as out_file:
+  configtest=tf.ConfigProto(allow_soft_placement=True)
+  configtest.gpu_options.allow_growth = True
+  configtest.gpu_options.per_process_gpu_memory_fraction = 1.5
+  # with tf.Session(config=tf.ConfigProto(allow_soft_placement=True)) as sess, gfile.Open(out_file_location, "w+") as out_file:
+  with tf.Session(config=configtest) as sess, gfile.Open(out_file_location, "w+") as out_file:
     video_id_batch, video_batch, num_frames_batch = get_input_data_tensors(reader, data_pattern, batch_size)
     latest_checkpoint = tf.train.latest_checkpoint(train_dir)
     if latest_checkpoint is None:
