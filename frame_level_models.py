@@ -259,18 +259,27 @@ class BiLstmModel(models.BaseModel):
     lstm_size = FLAGS.lstm_cells
     number_of_layers = FLAGS.lstm_layers
 
-    cell_fw = tf.contrib.rnn.BasicLSTMCell(
-                    lstm_size, forget_bias=1.0, state_is_tuple=False)
-    cell_bw = tf.contrib.rnn.BasicLSTMCell(
-                    lstm_size, forget_bias=1.0, state_is_tuple=False)
+    cell_fw = [tf.contrib.rnn.BasicLSTMCell(
+                    lstm_size, forget_bias=1.0, state_is_tuple=False)]
+    cell_bw = [tf.contrib.rnn.BasicLSTMCell(
+                    lstm_size, forget_bias=1.0, state_is_tuple=False)]
     # initial states
-    initial_state_fw = cell_fw.zero_state(batch_size, tf.float32)
-    initial_state_bw = cell_bw.zero_state(batch_size, tf.float32)
-
-    outputs, output_state_fw, output_state_bw = tf.nn.bidirectional_rnn(cell_fw, cell_bw, X, 
-                                               initial_state_fw=initial_state_fw,
-                                               initial_state_bw=initial_state_bw, 
-                                               sequence_length=num_frames)
+    initial_state_fw = cell_fw[0].zero_state(tf.shape(num_frames)[0], tf.float32)
+    initial_state_bw = cell_bw[0].zero_state(tf.shape(num_frames)[0], tf.float32)
+    
+    # outputs, output_state_fw, output_state_bw = tf.contrib.rnn.stack_bidirectional_rnn(
+    #     					cell_fw, 
+    #     					cell_bw, 
+    #     					model_input,             
+    #     					initial_states_fw=initial_state_fw,
+    #                                             initial_states_bw=initial_state_bw, 
+    #                                             sequence_length=num_frames)
+    
+    outputs, output_state_fw, output_state_bw = tf.contrib.rnn.stack_bidirectional_rnn(
+						cell_fw, 
+						cell_bw, 
+						model_input,             
+                                                sequence_length=num_frames)
     
     aggregated_model = getattr(video_level_models,
                                FLAGS.video_level_classifier_model)
