@@ -243,14 +243,12 @@ class BiLstmModel(models.BaseModel):
 
   def create_model(self, model_input, vocab_size, num_frames, **unused_params):
     """Creates a model which uses a stack of LSTMs to represent the video.
-
     Args:
       model_input: A 'batch_size' x 'max_frames' x 'num_features' matrix of
                    input features.
       vocab_size: The number of classes in the dataset.
       num_frames: A vector of length 'batch' which indicates the number of
            frames for each video (before padding).
-
     Returns:
       A dictionary with a tensor containing the probability predictions of the
       model in the 'predictions' key. The dimensions of the tensor are
@@ -259,35 +257,35 @@ class BiLstmModel(models.BaseModel):
     lstm_size = FLAGS.lstm_cells
     number_of_layers = FLAGS.lstm_layers
 
-    cell_fw = [tf.contrib.rnn.BasicLSTMCell(
-                    lstm_size, forget_bias=1.0, state_is_tuple=False)]
-    cell_bw = [tf.contrib.rnn.BasicLSTMCell(
-                    lstm_size, forget_bias=1.0, state_is_tuple=False)]
-    # initial states
-    initial_state_fw = cell_fw[0].zero_state(tf.shape(num_frames)[0], tf.float32)
-    initial_state_bw = cell_bw[0].zero_state(tf.shape(num_frames)[0], tf.float32)
-    
-    # outputs, output_state_fw, output_state_bw = tf.contrib.rnn.stack_bidirectional_rnn(
-    #     					cell_fw, 
-    #     					cell_bw, 
-    #     					model_input,             
-    #     					initial_states_fw=initial_state_fw,
-    #                                             initial_states_bw=initial_state_bw, 
-    #                                             sequence_length=num_frames)
-    
-    outputs, output_state_fw, output_state_bw = tf.contrib.rnn.stack_bidirectional_rnn(
-						cell_fw, 
-						cell_bw, 
-						model_input,             
-                                                sequence_length=num_frames)
-    
+    # with tf.variable_scope("bi") as scope:
+
+    lstm_cell_fw = tf.contrib.rnn.BasicLSTMCell(
+                    lstm_size, forget_bias=1.0, state_is_tuple=False)
+    lstm_cell_bw = tf.contrib.rnn.BasicLSTMCell(
+                    lstm_size, forget_bias=1.0, state_is_tuple=False)
+
+    # with tf.variable_scope('forward_1'):
+    cell_fw = tf.contrib.rnn.MultiRNNCell([tf.contrib.rnn.BasicLSTMCell(lstm_size, forget_bias=1.0, state_is_tuple=False) for _ in range(number_of_layers)], state_is_tuple=False)
+    # with tf.variable_scope('forward_2'):
+    cell_bw = tf.contrib.rnn.MultiRNNCell([tf.contrib.rnn.BasicLSTMCell(lstm_size, forget_bias=1.0, state_is_tuple=False) for _ in range(number_of_layers)], state_is_tuple=False)
+
+                                      sequence_length=num_frames)
+    outputs, output_state = tf.nn.bidirectional_dynamic_rnn(
+                                                cell_fw,
+                                                cell_bw,
+                                                model_input,
+                                                sequence_length=num_frames,
+                                                dtype=tf.float32)
+
     aggregated_model = getattr(video_level_models,
-                               FLAGS.video_level_classifier_model)
+                                   FLAGS.video_level_classifier_model)
 
-
+    # model_input_next = tf.concat(outputs, axis=2)
+    # model_input_next = outputs[0] + outputs[1]
+    model_input_next = tf.concat(output_state, axis=1)
 
 
     return aggregated_model().create_model(
-        model_input = output_state_fw + output_state_bw,
+        model_input = model_input_next,
         vocab_size=vocab_size,
         **unused_params)
