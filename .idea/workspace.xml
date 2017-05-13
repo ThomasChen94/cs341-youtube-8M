@@ -2,10 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a8a37718-7b29-486b-a852-c2395b96e7d0" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/shuffle_learn_layer.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/frame_level_debug.sh" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/lstm_frame_level_train_debug.sh" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/README.md" afterPath="$PROJECT_DIR$/README.md" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/frame_level_eval.sh" afterPath="$PROJECT_DIR$/frame_level_eval.sh" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/frame_level_inference.sh" afterPath="$PROJECT_DIR$/frame_level_inference.sh" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/frame_level_models.py" afterPath="$PROJECT_DIR$/frame_level_models.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/frame_level_train.sh" afterPath="$PROJECT_DIR$/frame_level_train.sh" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/utils.py" afterPath="$PROJECT_DIR$/utils.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lstm_frame_level_train.sh" afterPath="$PROJECT_DIR$/lstm_frame_level_train.sh" />
     </list>
     <ignored path="cs341-youtube-8M.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -34,7 +38,19 @@
         <entry file="file://$PROJECT_DIR$/frame_level_models.py">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.8326772">
-              <caret line="252" column="78" selection-start-line="252" selection-start-column="78" selection-end-line="252" selection-end-column="78" />
+              <caret line="291" column="40" selection-start-line="291" selection-start-column="40" selection-end-line="291" selection-end-column="40" />
+              <folding>
+                <element signature="e#681#692#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="frame_level_train.sh" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/frame_level_train.sh">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="-4.4074073">
+              <caret line="7" column="0" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -121,9 +137,10 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/frame_level_models.py" />
         <option value="$PROJECT_DIR$/utils.py" />
         <option value="$PROJECT_DIR$/shuffle_learn_layer.py" />
+        <option value="$PROJECT_DIR$/frame_level_train.sh" />
+        <option value="$PROJECT_DIR$/frame_level_models.py" />
       </list>
     </option>
   </component>
@@ -458,7 +475,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+          <folding>
+            <element signature="e#681#692#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -520,7 +539,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+          <folding>
+            <element signature="e#681#692#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -528,7 +549,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+          <folding>
+            <element signature="e#681#692#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -562,7 +585,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="235" column="24" selection-start-line="235" selection-start-column="24" selection-end-line="235" selection-end-column="24" />
-          <folding />
+          <folding>
+            <element signature="e#681#692#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -596,7 +621,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+          <folding>
+            <element signature="e#681#692#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -621,7 +648,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+          <folding>
+            <element signature="e#681#692#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -729,11 +758,21 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/frame_level_train.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-4.4074073">
+          <caret line="7" column="0" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/frame_level_models.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.8326772">
-          <caret line="252" column="78" selection-start-line="252" selection-start-column="78" selection-end-line="252" selection-end-column="78" />
-          <folding />
+          <caret line="291" column="40" selection-start-line="291" selection-start-column="40" selection-end-line="291" selection-end-column="40" />
+          <folding>
+            <element signature="e#681#692#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
