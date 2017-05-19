@@ -15,10 +15,11 @@
 """Contains a collection of util functions for training and evaluating.
 """
 
-import numpy
+import numpy as np
 import tensorflow as tf
 from tensorflow import logging
-
+import random
+import itertools
 
 def Dequantize(feat_vector, max_quantized_value=2, min_quantized_value=-2):
   """Dequantize the feature from the byte format to the float format.
@@ -203,3 +204,40 @@ def combine_gradients(tower_grads):
     final_grads.append((grad, filtered_grads[0][i][1],))
 
   return final_grads
+
+
+def attach_label(index):
+    second_larger_than_first = index[:,1] > index[:,0]
+    third_larger_than_first  = index[:,2] > index[:,0]
+    third_larger_than_second = index[:,2] > index[:,1]
+    res1 = np.logical_and(np.logical_and(second_larger_than_first, third_larger_than_first),third_larger_than_second)
+
+    second_smaller_than_first = index[:,1] < index[:,0]
+    third_smaller_than_first  = index[:,2] < index[:,0]
+    third_smaller_than_second = index[:,2] < index[:,1]
+    res2 = np.logical_and(np.logical_and(second_smaller_than_first, third_smaller_than_first),third_smaller_than_second)
+    return np.logical_or(res1, res2)
+
+def random_pick_3(num_frames, num_tuples):
+    pick_res = []
+    label_res = []
+    for i in range(len(num_frames)):
+        pick_some = []
+        for j in range(num_tuples):
+            mid  = np.random.randint(0, num_frames[i])
+            if(mid == num_frames[i] - 1 or mid == 0):
+                mid = num_frames[i] / 2
+            low  = np.random.randint(0, mid)
+            high = np.random.randint(mid + 1, num_frames[i])
+            pick_some.extend(list(itertools.permutations([low, mid, high],3)))
+        random.shuffle(pick_some)
+        pick_some = np.asarray(pick_some)
+        pick_res.append(pick_some)
+        label_res.append(attach_label(pick_some))
+    return pick_res, label_res
+
+if __name__ == "__main__":
+    num_frames = [10, 9,17, 5]
+    #print random_pick_3(num_frames, 10)[1]
+    res, label =  random_pick_3(num_frames, 3)
+    print "wo ri ni ma de bo luo you"

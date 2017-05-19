@@ -20,9 +20,11 @@ import models
 import video_level_models
 import tensorflow as tf
 import model_utils as utils
+import shuffle_learn_layer as shuf
 
 import tensorflow.contrib.slim as slim
 from tensorflow import flags
+
 
 FLAGS = flags.FLAGS
 flags.DEFINE_integer("iterations", 30,
@@ -243,14 +245,12 @@ class BiLstmModel(models.BaseModel):
 
   def create_model(self, model_input, vocab_size, num_frames, **unused_params):
     """Creates a model which uses a stack of LSTMs to represent the video.
-
     Args:
       model_input: A 'batch_size' x 'max_frames' x 'num_features' matrix of
                    input features.
       vocab_size: The number of classes in the dataset.
       num_frames: A vector of length 'batch' which indicates the number of
            frames for each video (before padding).
-
     Returns:
       A dictionary with a tensor containing the probability predictions of the
       model in the 'predictions' key. The dimensions of the tensor are
@@ -320,3 +320,33 @@ class BiLstmModel(models.BaseModel):
         model_input = model_input_next,
         vocab_size=vocab_size,
         **unused_params)
+
+
+class RankModel(models.BaseModel):
+    def add_lstm_layer(self, lstm_input, num_frames):
+        lstm_size = FLAGS.lstm_cells
+        number_of_layers = FLAGS.lstm_layers
+
+        stacked_lstm = tf.contrib.rnn.MultiRNNCell(
+                [
+                    tf.contrib.rnn.BasicLSTMCell(
+                        lstm_size, forget_bias=1.0, state_is_tuple=False)
+                    for _ in range(number_of_layers)
+                    ], state_is_tuple=False)
+
+        loss = 0.0
+
+        outputs, state = tf.nn.dynamic_rnn(stacked_lstm, lstm_input,
+                                       sequence_length=num_frames,
+                                       dtype=tf.float32)
+        return outputs
+
+    def add_pooling_layer(self, pooling_input):
+        pool_output = tf.reduce_max(pooling_input, axis = 1)
+        return pool_output
+
+    def create_model(self, model_input, vocab_size, num_frames, **unused_params):
+        shuffle_layer = shuf.shuffleLearnModel(num_frames)
+        lstm_outputs = self.add_lstm_layer(shuffle_layer.fc1_output1, num_frames)
+        pool_output = self.add_pooling_layer(lstm_outputs)
+        return {"predictions": pool_output}
