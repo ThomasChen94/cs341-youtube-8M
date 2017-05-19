@@ -80,11 +80,11 @@ class shuffleLearnModel():
 
         with tf.variable_scope("fc1"):
             fc1_input1 = tf.reshape(activ2, [activ2.shape[0], -1])
-            fc1_output1 = tf.layers.dense(inputs=fc1_input1, units=1024, activation=tf.nn.sigmoid)
+            self.fc1_output1 = tf.layers.dense(inputs=fc1_input1, units=1024, activation=tf.nn.sigmoid)
 
 
         # return the output of the fully connected layer
-        return fc1_output1
+        return self.fc1_output1
 
 
     def add_random_combination(self, input_features, num_frames):
@@ -120,10 +120,17 @@ class shuffleLearnModel():
         '''
         sample_list_spread = tf.reshape(sample_list, [-1, sample_list.shape[2]])
         label_list_spread = tf.reshape(label_list, [-1, ])
-        shuffle_loss = tf.nn.softmax_cross_entropy_with_logits(sample_list_spread, label_list_spread)
-        return shuffle_loss
+        self.shuffle_loss = tf.nn.softmax_cross_entropy_with_logits(sample_list_spread, label_list_spread)
+        return self.shuffle_loss
 
-
+    def __init__(self, num_frames):
+        self.config = Config()
+        self.input_placeholder = None
+        self.dropout_placeholder = None
+        self.add_placeholders()
+        output_feat = self.add_extract_op()
+        sample_list, label_list = self.add_random_combination(output_feat, num_frames)
+        self.loss = self.add_shuffle_loss(sample_list, label_list)
 
 
 
