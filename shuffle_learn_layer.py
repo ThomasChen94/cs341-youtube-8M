@@ -29,9 +29,9 @@ class Config:
     pool1_length = 5
 
     # parameters for the second layer
-    filter1_size = 3
-    conv1_output_channel = 8
-    pool1_length = 5
+    filter2_size = 3
+    conv2_output_channel = 8
+    pool2_length = 3
 
     feature_size = 1024
     input_length = 1024
@@ -40,12 +40,12 @@ class Config:
 
     num_shuffle_sample = 10
 
-    def __init__(self, args):
+    def __init__(self):
         self.batch_size = 16
 
 class shuffleLearnModel():
     def add_placeholders(self):
-        self.input_placeholder  = tf.placeholder(tf.int32, [None, Config.input_length, Config.feature_size])
+        self.input_placeholder  = tf.placeholder(tf.float32, [None, Config.input_length, Config.feature_size])
         self.dropout_placeholder = tf.placeholder(tf.float32)
         #self.num_frames = tf.placeholder(tf.int32, [None])
 
@@ -56,35 +56,42 @@ class shuffleLearnModel():
         return feed_dict
 
     def add_extract_op(self):
-        with tf.variable_scope("conv1"):
-            # the first convolutional layer
-            filter1 = tf.get_variable("f1", [None, Config.filter1_size, Config.conv1_output_channel])
-            conv1 = tf.nn.conv1d(self.input_placeholder1, filter1, stride = 2, padding= "SAME")
-
-            # pooling
-            pool1 = tf.nn.pool(conv1, [Config.pool1_length], "MAX", "SAME")
-
-            # activate
-            activ1 = tf.nn.relu(pool1)
-
-        with tf.variable_scope("conv2"):
-            # the first convolutional layer
-            filter2 = tf.get_variable("f2", [None, Config.filter2_size, Config.conv2_output_channel])
-            conv2 = tf.nn.conv1d(activ1, filter2, stride = 2, padding= "SAME")
-
-            # pooling
-            pool2 = tf.nn.pool(conv2, [Config.pool2_length], "MAX", "SAME")
-
-            # activate
-            activ2 = tf.nn.relu(pool2)
-
-        with tf.variable_scope("fc1"):
-            fc1_input1 = tf.reshape(activ2, [activ2.shape[0], -1])
-            self.fc1_output1 = tf.layers.dense(inputs=fc1_input1, units=1024, activation=tf.nn.sigmoid)
-
-
         # return the output of the fully connected layer
-        return self.fc1_output1
+	output_list = []
+        for i in range(Config.input_length):
+            with tf.variable_scope("conv1", reuse = None if i == 0 else True):
+                # the first convolutional layer
+                filter1 = tf.get_variable("f1", [Config.filter1_size, 1, Config.conv1_output_channel])
+		conv1_input = tf.reshape(self.input_placeholder[:,i,:], [-1, Config.feature_size, 1 ])
+                conv1 = tf.nn.conv1d(conv1_input, filter1, stride = 2, padding= "SAME")
+
+                # pooling
+                pool1 = tf.nn.pool(conv1, [Config.pool1_length], "MAX", "SAME")
+
+                # activate
+                activ1 = tf.nn.relu(pool1)
+
+            with tf.variable_scope("conv2", reuse = None if i == 0 else True):
+                # the first convolutional layer
+                filter2 = tf.get_variable("f2", [Config.filter2_size, Config.conv1_output_channel, Config.conv2_output_channel])
+                conv2 = tf.nn.conv1d(activ1, filter2, stride = 2, padding= "SAME")
+
+                # pooling
+                pool2 = tf.nn.pool(conv2, [Config.pool2_length], "MAX", "SAME")
+
+                # activate
+                activ2 = tf.nn.relu(pool2)
+
+            with tf.variable_scope("fc1", reuse = None if i == 0 else True):
+		activ2_shape = activ2.get_shape().as_list()
+                fc1_input1 = tf.reshape(activ2, [ -1, Config.conv2_output_channel * activ2_shape[1] ])
+                fc1_output1 = tf.layers.dense(inputs=fc1_input1, units=1024, activation=tf.nn.sigmoid)
+
+            output_list.append(fc1_output1)
+        # return the output of the fully connected layer
+        self.output_tensor = tf.stack(output_list, axis = 1)
+        self.output_tensor = tf.reshape(self.output_tensor, [-1, Config.input_length, Config.feature_size])
+        return self.output_tensor
 
 
     def add_random_combination(self, input_features, num_frames):
@@ -93,7 +100,9 @@ class shuffleLearnModel():
         Returns:
 
         """
-        shuffle_list, label_list = random_pick_3(num_frames, Config.num_shuffle_sample) # 3-D np array [batch_size, num_samples, 3]
+	sess_temp = tf.Session()
+	num_frames_np = sess_temp.run(num_frames)
+        shuffle_list, label_list = random_pick_3(num_frames_np, Config.num_shuffle_sample) # 3-D np array [batch_size, num_samples, 3]
         input_embedding_list = tf.unstack(input_features, axis = 0)
         sample_list = []
         label_list = tf.convert_to_tensor(label_list)

@@ -221,10 +221,13 @@ def attach_label(index):
 def random_pick_3(num_frames, num_tuples):
     pick_res = []
     label_res = []
-    for i in range(len(num_frames)):
+    sess = tf.Session()
+    num_frames = sess.run(num_frames)
+    for i in range(num_frames.shape[0]):
         pick_some = []
         for j in range(num_tuples):
-            mid  = np.random.randint(0, num_frames[i])
+	   # print tf.to_int32(num_frames[i])
+            mid  = np.random.randint(0, tf.to_int32(num_frames[i]))
             if(mid == num_frames[i] - 1 or mid == 0):
                 mid = num_frames[i] / 2
             low  = np.random.randint(0, mid)
