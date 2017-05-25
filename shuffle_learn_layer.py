@@ -100,20 +100,22 @@ class shuffleLearnModel():
         Returns:
 
         """
-	sess_temp = tf.Session()
-	num_frames_np = sess_temp.run(num_frames)
-        shuffle_list, label_list = random_pick_3(num_frames_np, Config.num_shuffle_sample) # 3-D np array [batch_size, num_samples, 3]
-        input_embedding_list = tf.unstack(input_features, axis = 0)
-        sample_list = []
-        label_list = tf.convert_to_tensor(label_list)
-        for i in range(input_features.shape[0]):
+        shuffle_list, label_list = random_pick_3(num_frames, Config.num_shuffle_sample) # 3-D np array [batch_size, num_samples, 3]
+       # input_embedding_list = tf.unstack(input_features, axis = 0)
+        input_embedding_list = input_features
+	sample_list = []
+        #label_list = tf.convert_to_tensor(label_list)
+	video_num = num_frames.get_shape().as_list()[0]
+	label_list = tf.constant(label_list, dtype = tf.bool, shape = [video_num ,60])
+        for i in range(video_num):
             # loop over the batch_size
-            shuffle_index = tf.convert_to_tensor(shuffle_list[i])
+            #shuffle_index = tf.convert_to_tensor(shuffle_list[i])
+	    shuffle_index = tf.Variable(shuffle_list[i], dtype = tf.int32)
             shuffle_value = tf.nn.embedding_lookup(input_embedding_list[i], shuffle_index)
             shuffle_concat_list = []
             for j in range(shuffle_value.shape[0]):
                 shuffle_concat_list.append(tf.concat([shuffle_value[j][0], shuffle_value[j][1], shuffle_value[j][2]],
-                                                     axis = 1))
+                                                     axis = 0))
             sample_list.append(shuffle_concat_list)
         return sample_list, label_list
 
@@ -127,9 +129,22 @@ class shuffleLearnModel():
         It needs further discussion
 
         '''
-        sample_list_spread = tf.reshape(sample_list, [-1, sample_list.shape[2]])
-        label_list_spread = tf.reshape(label_list, [-1, ])
-        self.shuffle_loss = tf.nn.softmax_cross_entropy_with_logits(sample_list_spread, label_list_spread)
+        # sample_list_spread = tf.reshape(sample_list, [-1, ]) # mark!!!!!! concatenate use or not
+	predictions = []
+	for i in range(label_list.get_shape().as_list()[0]):
+	    pred_one_video = []
+	    for j in range(label_list.get_shape().as_list()[1]):
+                with tf.variable_scope("a", reuse = None if (i == 0 and j == 0) else True):
+                    a = tf.get_variable("a", [Config.feature_size * 3])
+		    pred_one_video.append(tf.reduce_sum(tf.multiply(a, sample_list[i][j])))
+		    tf.stack(pred_one_video, axis = 0)
+	    predictions.append(pred_one_video)
+	tf.stack(predictions, axis = 0)
+	       	
+# to get sample_list_spread
+
+
+        self.shuffle_loss = tf.nn.softmax_cross_entropy_with_logits(logits=predictions, labels=label_list)
         return self.shuffle_loss
 
     def __init__(self, num_frames):
@@ -140,7 +155,7 @@ class shuffleLearnModel():
         output_feat = self.add_extract_op()
         sample_list, label_list = self.add_random_combination(output_feat, num_frames)
         self.loss = self.add_shuffle_loss(sample_list, label_list)
-
+        # self.loss = self.add_shuffle_loss(NONE,sample_list, label_list,-1,NONE)
 
 
 
