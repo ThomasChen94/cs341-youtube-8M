@@ -347,6 +347,6 @@ class RankModel(models.BaseModel):
 
     def create_model(self, model_input, vocab_size, num_frames, **unused_params):
         shuffle_layer = shuf.shuffleLearnModel(num_frames)
-        lstm_outputs = self.add_lstm_layer(shuffle_layer.fc1_output1, num_frames)
+        lstm_outputs = self.add_lstm_layer(shuffle_layer.output_tensor, num_frames)
         pool_output = self.add_pooling_layer(lstm_outputs)
         return {"predictions": pool_output}
