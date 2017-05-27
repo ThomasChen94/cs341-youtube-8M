@@ -119,7 +119,9 @@ class shuffleLearnModel():
             sample_list.append(shuffle_concat_list)
         return sample_list, label_list
 
+    def add_random_pick(self, input_features):
 
+	
     def add_shuffle_loss(self, sample_list, label_list):
         #!!!!!!!!! Need Discussion!!!!!!!!
         '''
