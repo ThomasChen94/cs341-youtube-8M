@@ -87,7 +87,7 @@ class shuffleLearnModel():
             output_list.append(fc1_output1)
         # return the output of the fully connected layer
         self.output_tensor = tf.stack(output_list, axis = 1)
-        self.output_tensor = tf.reshape(output_tensor, [-1, Config.input_length, Config.feature_size])
+        self.output_tensor = tf.reshape(self.output_tensor, [-1, Config.input_length, Config.feature_size])
         return self.output_tensor
 
 
