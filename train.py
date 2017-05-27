@@ -409,6 +409,7 @@ class Trainer(object):
     with sv.managed_session(target, config=self.config) as sess:
       try:
         logging.info("%s: Entering training loop.", task_as_string(self.task))
+        # writer = tf.summary.FileWriter("logs/", sess.graph);
         while (not sv.should_stop()) and (not self.max_steps_reached):
           batch_start_time = time.time()
           _, global_step_val, loss_val, predictions_val, labels_val = sess.run(

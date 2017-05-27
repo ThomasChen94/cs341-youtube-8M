@@ -19,7 +19,7 @@ class Config:
 
     hidden_size1 = 864
     hidden_size2 = 720
-    batch_size = 16
+    batch_size = 64
     max_grad_norm = 10.0 # max gradients norm for clipping
     lr = 0.001 # learning rate
 
@@ -34,26 +34,26 @@ class Config:
     pool2_length = 3
 
     feature_size = 1024
-    input_length = 1024
+    input_length = 300
 
     input_num_once = 3
 
     num_shuffle_sample = 10
 
     def __init__(self):
-        self.batch_size = 16
+        self.batch_size = 64
 
 class shuffleLearnModel():
-    def add_placeholders(self):
-        self.input_placeholder  = tf.placeholder(tf.float32, [None, Config.input_length, Config.feature_size])
-        self.dropout_placeholder = tf.placeholder(tf.float32)
+    def add_placeholders(self, input_features):
+        self.input_placeholder  = input_features
+        #self.dropout_placeholder = tf.placeholder(tf.float32)
         #self.num_frames = tf.placeholder(tf.int32, [None])
 
-    def create_feed_dict(self, inputs_batch):
-        feed_dict = {}
-        feed_dict[self.input_placeholder] = inputs_batch
-        #feed_dict[self.num_frames] = num_frames
-        return feed_dict
+    #def create_feed_dict(self, inputs_batch):
+    #    feed_dict = {}
+    #    feed_dict[self.input_placeholder] = inputs_batch
+    #    #feed_dict[self.num_frames] = num_frames
+    #    return feed_dict
 
     def add_extract_op(self):
 
@@ -102,12 +102,12 @@ class shuffleLearnModel():
         Returns:
 
         """
-        shuffle_list, label_list = random_pick_3(num_frames, Config.num_shuffle_sample) # 3-D np array [batch_size, num_samples, 3]
+        shuffle_list, label_list = random_pick_3(num_frames, Config.num_shuffle_sample, 1) # 3-D np array [batch_size, num_samples, 3]
        # input_embedding_list = tf.unstack(input_features, axis = 0)
         input_embedding_list = input_features
         sample_list = []
         #label_list = tf.convert_to_tensor(label_list)
-        video_num = num_frames.get_shape().as_list()[0]
+        video_num = 1
         label_list = tf.constant(label_list, dtype = tf.bool, shape = [video_num ,60])
         for i in range(video_num):
             # loop over the batch_size
@@ -151,11 +151,11 @@ class shuffleLearnModel():
         self.shuffle_loss = tf.nn.softmax_cross_entropy_with_logits(logits=predictions, labels=label_list)
         return self.shuffle_loss
 
-    def __init__(self, num_frames):
+    def __init__(self, num_frames, input_features):
         self.config = Config()
         self.input_placeholder = None
-        self.dropout_placeholder = None
-        self.add_placeholders()
+       # self.dropout_placeholder = None
+        self.add_placeholders(input_features)
         output_feat = self.add_extract_op()
         sample_list, label_list = self.add_random_combination(output_feat, num_frames)
         self.loss = self.add_shuffle_loss(sample_list, label_list)

@@ -218,14 +218,15 @@ def attach_label(index):
     res2 = np.logical_and(np.logical_and(second_smaller_than_first, third_smaller_than_first),third_smaller_than_second)
     return np.logical_or(res1, res2).tolist()
 
-def random_pick_3(num_frames, num_tuples):
+def random_pick_3(num_frames, num_tuples, batch_size):
     pick_res = []
     label_res = []
    # sess = tf.Session()
    # num_frames = sess.run(num_frames)
-    num_frames = np.ones(tf.shape(num_frames))
+   # num_frames = np.ones(tf.shape(num_frames))
+    num_frames = np.ones(batch_size)
     num_frames = num_frames * 300
-    for i in range(num_frames.shape[0]):
+    for i in range(batch_size):
         pick_some = []
         for j in range(num_tuples):
 	   # print tf.to_int32(num_frames[i])

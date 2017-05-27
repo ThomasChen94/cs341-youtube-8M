@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
 
 """Contains a collection of models which operate on variable-length sequences.
 """
@@ -344,10 +343,15 @@ class RankModel(models.BaseModel):
 
     def add_pooling_layer(self, pooling_input):
         pool_output = tf.reduce_max(pooling_input, axis = 1)
-        return pool_output
+        return pool_output 
 
     def create_model(self, model_input, vocab_size, num_frames, **unused_params):
-        shuffle_layer = shuf.shuffleLearnModel(num_frames)
+        shuffle_layer = shuf.shuffleLearnModel(num_frames, model_input)
         lstm_outputs = self.add_lstm_layer(shuffle_layer.output_tensor, num_frames)
         pool_output = self.add_pooling_layer(lstm_outputs)
-        return {"predictions": pool_output}
+	aggregated_model = getattr(video_level_models,
+                                   FLAGS.video_level_classifier_model)	
+        return aggregated_model().create_model(
+       		 model_input = pool_output,
+      		 vocab_size=vocab_size,
+        	**unused_params)

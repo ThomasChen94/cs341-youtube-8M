@@ -1,0 +1,144 @@
+[33mcommit 3e3b79b8e8ba3b19d09a25772bab39ad9e1e9138[m
+Author: dnuang <danny.dopa@gmail.com>
+Date:   Sat May 27 21:36:32 2017 +0000
+
+    frame model #
+
+[33mcommit f4d9f2ac9fce2cbeb2f340f62dfc778457265ad9[m
+Merge: 9ab19f6 8c24148
+Author: ThomasChen94 <ThomasChen@DN0a24a21f.SUNet>
+Date:   Fri May 26 21:22:47 2017 -0700
+
+    sync with local
+
+[33mcommit 9ab19f6910090558c1c79f4ea2cda8ba4b0c1cb8[m
+Author: ThomasChen94 <ThomasChen@DN0a24a21f.SUNet>
+Date:   Fri May 26 20:58:44 2017 -0700
+
+    local sync
+
+[33mcommit 8c241489db218c45b605ecb7cdcda3edd732a4a4[m
+Author: Chen Qian <qianchen94era@gmail.com>
+Date:   Sat May 27 03:57:41 2017 +0000
+
+    new logic of random pick
+
+[33mcommit e2c9a9c5005fd656e6773da956501cf9f4cb797e[m
+Author: Chen Qian <qianchen94era@gmail.com>
+Date:   Thu May 25 05:11:27 2017 +0000
+
+    no idea on dynamic
+
+[33mcommit 3f93e072fb8ba6fc64acd6a30dd3e959d80f02bb[m
+Author: Chen Qian <qianchen94era@gmail.com>
+Date:   Wed May 24 23:47:41 2017 +0000
+
+    add bug shuffle
+
+[33mcommit 8950c1eaca72927e0cff5171c677b018ce252372[m
+Merge: a35edab 06b0c68
+Author: ThomasChen94 <ThomasChen@DN0a249266.SUNet>
+Date:   Sat May 20 12:50:54 2017 -0700
+
+    Merge branch 'master' of https://github.com/ThomasChen94/cs341-youtube-8M
+
+[33mcommit a35edab08cce7082b74693ee7deb00a5bc9c987f[m
+Author: ThomasChen94 <ThomasChen@DN0a249266.SUNet>
+Date:   Sat May 20 12:50:36 2017 -0700
+
+    modify the cnn
+
+[33mcommit 06b0c68b7d2a2edbe1ff2bb1d77c88ef0be44120[m
+Merge: 5771d8b 43412be
+Author: Chen Qian <qianchen94era@gmail.com>
+Date:   Fri May 19 23:06:34 2017 +0000
+
+    merge
+
+[33mcommit 5771d8b6b613d1de42903f82ec3fb4ddc985da31[m
+Author: Chen Qian <qianchen94era@gmail.com>
+Date:   Fri May 19 23:03:25 2017 +0000
+
+    sync with rankModel
+
+[33mcommit 43412be63626f3218023d3be67d0650f5701d5f1[m
+Author: ThomasChen94 <ThomasChen@DN0a24a4e7.SUNet>
+Date:   Fri May 19 15:59:45 2017 -0700
+
+    add rankModel
+
+[33mcommit c82e4ee2bc498a9f6b624d87a7dbcee6ae9ac76d[m
+Merge: 304a61e d90cde2
+Author: ThomasChen94 <ThomasChen@DN0a248583.SUNet>
+Date:   Sat May 13 16:03:58 2017 -0700
+
+    Merge with Chen Qian
+
+[33mcommit 304a61e9d80fc75bbd76caa1d8f0a82f97b8590a[m
+Author: ThomasChen94 <ThomasChen@DN0a248583.SUNet>
+Date:   Sat May 13 16:01:35 2017 -0700
+
+    Add the frame of proposed model
+
+[33mcommit d90cde287673c9aa6c5bb4e63e71451f80979d4d[m
+Merge: 92a89a9 7629e14
+Author: Chen Qian <qianchen94era@gmail.com>
+Date:   Sat May 6 03:21:24 2017 +0000
+
+    Merge branch 'master' of https://github.com/ThomasChen94/cs341-youtube-8M
+
+[33mcommit 92a89a98c480893bb40081ec2b882e5f775e1e0e[m
+Author: Qian Yu <qianyu@one-gpu-instance.c.shaped-producer-163823.internal>
+Date:   Sat May 6 03:02:19 2017 +0000
+
+    bidirectional works
+
+[33mcommit 7629e147396ef1f5de5e85e3fae598943dec5f61[m
+Author: dnuang <danny.dopa@gmail.com>
+Date:   Tue May 2 21:27:31 2017 -0700
+
+    try commit
+
+[33mcommit 20121ce85bff919e4543e6fde00bb46257050604[m
+Author: Qian Yu <qianyu@one-gpu-instance.c.shaped-producer-163823.internal>
+Date:   Tue May 2 07:30:52 2017 +0000
+
+    push
+
+[33mcommit 58dc4ba5466d4f803e96749cad3bf1180ff56279[m
+Author: Qian Yu <qianyu@one-gpu-instance.c.shaped-producer-163823.internal>
+Date:   Tue May 2 07:28:23 2017 +0000
+
+    push
+
+[33mcommit 3d9606477efc5e565c7fad4bbd22aee4b3a6ba9b[m
+Author: Chen Qian <qianchen94era@gmail.com>
+Date:   Thu Apr 27 20:30:12 2017 +0000
+
+    add bidirectional rnn
+
+[33mcommit fbee90fb45f6045f1dbe61bb07aacb62dc50d0f3[m
+Author: Qian Yu <chn_yuqian@hotmail.com>
+Date:   Wed Apr 12 04:30:41 2017 +0000
+
+    1. Add validate and inference shell
+
+[33mcommit e14cdc5c208d7f9226c6312986dbc14338e62a55[m
+Author: Qian Yu <chn_yuqian@hotmail.com>
+Date:   Tue Apr 11 03:46:08 2017 +0000
+
+    1. Start a new project
+    2. Add the test shell: train.sh
+
+[33mcommit c8d01081ff2f28d1a0fb7c050e0a08058a95f928[m
+Author: Qian Yu <chn_yuqian@hotmail.com>
+Date:   Tue Apr 11 03:43:36 2017 +0000
+
+    1. Start a new project
+    2. Add the test shell: train.sh
+
+[33mcommit 49d21f8d2b12208582cf25edfa838524d757fab8[m
+Author: Chen Qian (Thomas) <qianchen94era@gmail.com>
+Date:   Mon Apr 10 17:01:08 2017 -0700
+
+    Initial commit
