@@ -350,8 +350,10 @@ class RankModel(models.BaseModel):
         lstm_outputs = self.add_lstm_layer(shuffle_layer.output_tensor, num_frames)
         pool_output = self.add_pooling_layer(lstm_outputs)
 	aggregated_model = getattr(video_level_models,
-                                   FLAGS.video_level_classifier_model)	
-        return aggregated_model().create_model(
-       		 model_input = pool_output,
-      		 vocab_size=vocab_size,
-        	**unused_params)
+                                   FLAGS.video_level_classifier_model)
+	result_dict = aggregated_model().create_model(
+                	 model_input = pool_output,
+                 	 vocab_size=vocab_size,
+               		 **unused_params)
+	result_dict['shuffle_loss'] = shuffle_layer.loss	
+        return result_dict 

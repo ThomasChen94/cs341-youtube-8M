@@ -292,6 +292,11 @@ def build_graph(reader,
             reg_loss += tf.add_n(reg_losses)
 
           tower_reg_losses.append(reg_loss)
+         
+	  if "shuffle_loss" in result.keys():
+            shuffle_loss = result["shuffle_loss"]
+          else:
+            shuffle_loss = tf.constant(0.0)
 
           # Adds update_ops (e.g., moving average updates in batch normalization) as
           # a dependency to the train_op.
@@ -307,7 +312,8 @@ def build_graph(reader,
           tower_label_losses.append(label_loss)
 
           # Incorporate the L2 weight penalties etc.
-          final_loss = regularization_penalty * reg_loss + label_loss
+	  shuffle_penalty = 0.1  # set the portion of shuffle loss
+          final_loss = shuffle_penalty * shuffle_loss +  regularization_penalty * reg_loss + label_loss
           gradients = optimizer.compute_gradients(final_loss,
               colocate_gradients_with_ops=False)
           tower_gradients.append(gradients)

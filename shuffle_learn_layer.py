@@ -112,7 +112,7 @@ class shuffleLearnModel():
         for i in range(video_num):
             # loop over the batch_size
             #shuffle_index = tf.convert_to_tensor(shuffle_list[i])
-	    shuffle_index = tf.Variable(shuffle_list[i], dtype = tf.int32)
+	    shuffle_index = tf.constant(shuffle_list[i], dtype = tf.int32, name = 'shuf_index')
             shuffle_value = tf.nn.embedding_lookup(input_embedding_list[i], shuffle_index)
             shuffle_concat_list = []
             for j in range(shuffle_value.shape[0]):
@@ -138,7 +138,7 @@ class shuffleLearnModel():
         for i in range(label_list.get_shape().as_list()[0]):
             pred_one_video = []
             for j in range(label_list.get_shape().as_list()[1]):
-                with tf.variable_scope("a", reuse = None if (i == 0 and j == 0) else True):
+                with tf.variable_scope("shuffle_loss", reuse = None if (i == 0 and j == 0) else True):
                     a = tf.get_variable("a", [Config.feature_size * 3])
                 pred_one_video.append(tf.reduce_sum(tf.multiply(a, sample_list[i][j])))
                 tf.stack(pred_one_video, axis = 0)
