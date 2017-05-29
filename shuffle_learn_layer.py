@@ -108,7 +108,7 @@ class shuffleLearnModel():
         sample_list = []
         #label_list = tf.convert_to_tensor(label_list)
         video_num = 1
-        label_list = tf.constant(label_list, dtype = tf.bool, shape = [video_num ,60])
+        label_list = tf.constant(label_list, dtype = tf.float32, shape = [video_num ,60])
         for i in range(video_num):
             # loop over the batch_size
             #shuffle_index = tf.convert_to_tensor(shuffle_list[i])
@@ -147,9 +147,11 @@ class shuffleLearnModel():
 
         # to get sample_list_spread
 
+	#predictions = tf.Variable(sample_list, name='shuffle_pred')
+        #self.shuffle_loss = tf.nn.softmax_cross_entropy_with_logits(logits=predictions, labels=label_list)
+	self.shuffle_loss = tf.nn.sigmoid_cross_entropy_with_logits(logits=predictions, labels=label_list)
+	return self.shuffle_loss
 
-        self.shuffle_loss = tf.nn.softmax_cross_entropy_with_logits(logits=predictions, labels=label_list)
-        return self.shuffle_loss
 
     def __init__(self, num_frames, input_features):
         self.config = Config()
