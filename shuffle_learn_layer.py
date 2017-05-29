@@ -150,6 +150,7 @@ class shuffleLearnModel():
 	#predictions = tf.Variable(sample_list, name='shuffle_pred')
         #self.shuffle_loss = tf.nn.softmax_cross_entropy_with_logits(logits=predictions, labels=label_list)
 	self.shuffle_loss = tf.nn.sigmoid_cross_entropy_with_logits(logits=predictions, labels=label_list)
+	self.shuffle_loss = tf.reduce_mean(self.shuffle_loss)
 	return self.shuffle_loss
 
 

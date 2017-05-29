@@ -225,7 +225,7 @@ def random_pick_3(num_frames, num_tuples, batch_size):
    # num_frames = sess.run(num_frames)
    # num_frames = np.ones(tf.shape(num_frames))
     num_frames = np.ones(batch_size)
-    num_frames = num_frames * 300
+    num_frames = num_frames * 100
     for i in range(batch_size):
         pick_some = []
         for j in range(num_tuples):
