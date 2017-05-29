@@ -91,9 +91,9 @@ class shuffleLearnModel():
             output_list.append(fc1_output1)
 
         # return the output of the fully connected layer
-        self.output_tensor = tf.stack(output_list, axis = 1)
-        self.output_tensor = tf.reshape(self.output_tensor, [-1, Config.input_length, Config.feature_size])
-        return self.output_tensor
+        output_tensor = tf.stack(output_list, axis = 1)
+        output_tensor = tf.reshape(output_tensor, [-1, Config.input_length, Config.feature_size])
+        return output_tensor
 
 
     def add_random_combination(self, input_features, num_frames):
@@ -156,8 +156,8 @@ class shuffleLearnModel():
         self.input_placeholder = None
        # self.dropout_placeholder = None
         self.add_placeholders(input_features)
-        output_feat = self.add_extract_op()
-        sample_list, label_list = self.add_random_combination(output_feat, num_frames)
+        self.output_feat = self.add_extract_op()
+        sample_list, label_list = self.add_random_combination(self.output_feat, num_frames)
         self.loss = self.add_shuffle_loss(sample_list, label_list)
         # self.loss = self.add_shuffle_loss(NONE,sample_list, label_list,-1,NONE)
 

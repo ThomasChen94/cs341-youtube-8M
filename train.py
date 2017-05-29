@@ -313,8 +313,9 @@ def build_graph(reader,
 
           # Incorporate the L2 weight penalties etc.
 	  shuffle_penalty = 0.1  # set the portion of shuffle loss
-          final_loss = shuffle_penalty * shuffle_loss +  regularization_penalty * reg_loss + label_loss
-          gradients = optimizer.compute_gradients(final_loss,
+          #final_loss = shuffle_penalty * shuffle_loss +  regularization_penalty * reg_loss + label_loss
+          final_loss = shuffle_loss
+	  gradients = optimizer.compute_gradients(final_loss,
               colocate_gradients_with_ops=False)
           tower_gradients.append(gradients)
   label_loss = tf.reduce_mean(tf.stack(tower_label_losses))
@@ -331,7 +332,8 @@ def build_graph(reader,
   train_op = optimizer.apply_gradients(merged_gradients, global_step=global_step)
 
   tf.add_to_collection("global_step", global_step)
-  tf.add_to_collection("loss", label_loss)
+  #tf.add_to_collection("loss", label_loss) # !!!!!!!Mark!!!!!!! print label loss
+  tf.add_to_collection("loss", final_loss)
   tf.add_to_collection("predictions", tf.concat(tower_predictions, 0))
   tf.add_to_collection("input_batch_raw", model_input_raw)
   tf.add_to_collection("input_batch", model_input)
@@ -415,7 +417,7 @@ class Trainer(object):
     with sv.managed_session(target, config=self.config) as sess:
       try:
         logging.info("%s: Entering training loop.", task_as_string(self.task))
-        # writer = tf.summary.FileWriter("logs/", sess.graph);
+        writer = tf.summary.FileWriter("logs/", sess.graph);
         while (not sv.should_stop()) and (not self.max_steps_reached):
           batch_start_time = time.time()
           _, global_step_val, loss_val, predictions_val, labels_val = sess.run(

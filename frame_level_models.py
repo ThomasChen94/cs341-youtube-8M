@@ -347,13 +347,13 @@ class RankModel(models.BaseModel):
 
     def create_model(self, model_input, vocab_size, num_frames, **unused_params):
         shuffle_layer = shuf.shuffleLearnModel(num_frames, model_input)
-        lstm_outputs = self.add_lstm_layer(shuffle_layer.output_tensor, num_frames)
+        lstm_outputs = self.add_lstm_layer(shuffle_layer.output_feat, num_frames)
         pool_output = self.add_pooling_layer(lstm_outputs)
 	aggregated_model = getattr(video_level_models,
                                    FLAGS.video_level_classifier_model)
 	result_dict = aggregated_model().create_model(
                 	 model_input = pool_output,
-                 	 vocab_size=vocab_size,
+                 	 vocab_size = vocab_size,
                		 **unused_params)
 	result_dict['shuffle_loss'] = shuffle_layer.loss	
         return result_dict 
