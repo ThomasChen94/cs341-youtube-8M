@@ -297,7 +297,8 @@ def build_graph(reader,
             shuffle_loss = result["shuffle_loss"]
           else:
             shuffle_loss = tf.constant(0.0)
-
+	  shuffle_pred = result['shuffle_pred']
+	  shuffle_input = result['shuffle_input']
           # Adds update_ops (e.g., moving average updates in batch normalization) as
           # a dependency to the train_op.
           update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
@@ -340,7 +341,8 @@ def build_graph(reader,
   tf.add_to_collection("num_frames", num_frames)
   tf.add_to_collection("labels", tf.cast(labels_batch, tf.float32))
   tf.add_to_collection("train_op", train_op)
-
+  tf.add_to_collection("shuffle_pred", shuffle_pred)
+  tf.add_to_collection("shuffle_input", shuffle_input)
 
 class Trainer(object):
   """A Trainer to train a Tensorflow graph."""
@@ -402,6 +404,8 @@ class Trainer(object):
         labels = tf.get_collection("labels")[0]
         train_op = tf.get_collection("train_op")[0]
         init_op = tf.global_variables_initializer()
+	shuffle_pred = tf.get_collection("shuffle_pred")[0]
+	shuffle_input = tf.get_collection("shuffle_input")[0]
 
     sv = tf.train.Supervisor(
         graph,
@@ -420,8 +424,9 @@ class Trainer(object):
         writer = tf.summary.FileWriter("logs/", sess.graph);
         while (not sv.should_stop()) and (not self.max_steps_reached):
           batch_start_time = time.time()
-          _, global_step_val, loss_val, predictions_val, labels_val = sess.run(
-              [train_op, global_step, loss, predictions, labels])
+          _, global_step_val, loss_val, predictions_val, labels_val, shuffle_pred_val, shuffle_input_val = sess.run(
+              [train_op, global_step, loss, predictions, labels, shuffle_pred, shuffle_input])
+	  #print shuffle_input_val
           seconds_per_batch = time.time() - batch_start_time
           examples_per_second = labels_val.shape[0] / seconds_per_batch
 

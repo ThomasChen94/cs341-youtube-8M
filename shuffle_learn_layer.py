@@ -87,7 +87,7 @@ class shuffleLearnModel():
                 activ2_shape = activ2.get_shape().as_list()
                 fc1_input1 = tf.reshape(activ2, [ -1, Config.conv2_output_channel * activ2_shape[1] ])
 		fc1_input1 = self.input_placeholder[:,i,:]
-                fc1_output1 = tf.layers.dense(inputs=fc1_input1, units=1024, activation=tf.nn.sigmoid)
+                fc1_output1 = tf.layers.dense(inputs=fc1_input1, units=1024,kernel_initializer=tf.contrib.layers.xavier_initializer(), activation=tf.nn.sigmoid)
 
             output_list.append(fc1_output1)
 
@@ -152,7 +152,7 @@ class shuffleLearnModel():
         #self.shuffle_loss = tf.nn.softmax_cross_entropy_with_logits(logits=predictions, labels=label_list)
 	self.shuffle_loss = tf.nn.sigmoid_cross_entropy_with_logits(logits=predictions, labels=label_list)
 	self.shuffle_loss = tf.reduce_mean(self.shuffle_loss)
-	return self.shuffle_loss
+	return sample_list, self.shuffle_loss
 
 
     def __init__(self, num_frames, input_features):
@@ -162,7 +162,7 @@ class shuffleLearnModel():
         self.add_placeholders(input_features)
         self.output_feat = self.add_extract_op()
         sample_list, label_list = self.add_random_combination(self.output_feat, num_frames)
-        self.loss = self.add_shuffle_loss(sample_list, label_list)
+        self.shuffle_pred, self.loss = self.add_shuffle_loss(sample_list, label_list)
         # self.loss = self.add_shuffle_loss(NONE,sample_list, label_list,-1,NONE)
 
 

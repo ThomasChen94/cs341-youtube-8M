@@ -356,4 +356,6 @@ class RankModel(models.BaseModel):
                  	 vocab_size = vocab_size,
                		 **unused_params)
 	result_dict['shuffle_loss'] = shuffle_layer.loss	
+	result_dict['shuffle_pred'] = shuffle_layer.shuffle_pred
+	result_dict['shuffle_input'] = shuffle_layer.input_placeholder
         return result_dict 
