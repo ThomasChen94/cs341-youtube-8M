@@ -426,7 +426,7 @@ class Trainer(object):
           batch_start_time = time.time()
           _, global_step_val, loss_val, predictions_val, labels_val, shuffle_pred_val, shuffle_input_val = sess.run(
               [train_op, global_step, loss, predictions, labels, shuffle_pred, shuffle_input])
-	  #print shuffle_input_val
+	  print shuffle_pred_val
           seconds_per_batch = time.time() - batch_start_time
           examples_per_second = labels_val.shape[0] / seconds_per_batch
 

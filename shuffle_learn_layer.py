@@ -38,14 +38,14 @@ class Config:
 
     input_num_once = 3
 
-    num_shuffle_sample = 10
+    num_shuffle_sample = 1
 
     def __init__(self):
         self.batch_size = 64
 
 class shuffleLearnModel():
     def add_placeholders(self, input_features):
-        self.input_placeholder  = input_features
+        self.input_placeholder  = input_features * 100
         #self.dropout_placeholder = tf.placeholder(tf.float32)
         #self.num_frames = tf.placeholder(tf.int32, [None])
 
@@ -57,7 +57,8 @@ class shuffleLearnModel():
 
     def add_extract_op(self):
 
-        output_list = []
+        output_list_for_shuffle = []
+	output_list_for_lstm = []
 
         for i in range(Config.input_length):
             with tf.variable_scope("conv1", reuse = None if i == 0 else True):
@@ -88,13 +89,17 @@ class shuffleLearnModel():
                 fc1_input1 = tf.reshape(activ2, [ -1, Config.conv2_output_channel * activ2_shape[1] ])
 		#fc1_input1 = self.input_placeholder[:,i,:]
                 fc1_output1 = tf.layers.dense(inputs=fc1_input1, units=1024,kernel_initializer=tf.contrib.layers.xavier_initializer(), activation=tf.nn.sigmoid)
-
-            output_list.append(fc1_output1)
+	    with tf.variable_scope("fc2", reuse = None if i == 0 else True):
+                fc2_output1 = tf.layers.dense(inputs=fc1_output1, units=16,kernel_initializer=tf.contrib.layers.xavier_initializer(), activation=tf.nn.sigmoid)
+            output_list_for_shuffle.append(fc2_output1)
+	    output_list_for_lstm.append(fc1_output1)
 
         # return the output of the fully connected layer
-        output_tensor = tf.stack(output_list, axis = 1)
-        output_tensor = tf.reshape(output_tensor, [-1, Config.input_length, Config.feature_size])
-        return output_tensor
+        output_tensor_for_shuffle = tf.stack(output_list_for_shuffle, axis = 1)
+        output_tensor_for_shuffle = tf.reshape(output_tensor_for_shuffle, [-1, Config.input_length, 16])
+        output_tensor_for_lstm = tf.stack(output_list_for_lstm, axis = 1)
+        output_tensor_for_lstm = tf.reshape(output_tensor_for_lstm, [-1, Config.input_length, Config.feature_size])
+	return output_tensor_for_shuffle, output_tensor_for_lstm
 
 
     def add_random_combination(self, input_features, num_frames):
@@ -109,7 +114,7 @@ class shuffleLearnModel():
         sample_list = []
         #label_list = tf.convert_to_tensor(label_list)
         video_num = 1
-        label_list = tf.constant(label_list, dtype = tf.float32, shape = [video_num ,60])
+        label_list = tf.constant(label_list, dtype = tf.float32, shape = [video_num ,Config.num_shuffle_sample * 6])
         for i in range(video_num):
             # loop over the batch_size
             #shuffle_index = tf.convert_to_tensor(shuffle_list[i])
@@ -140,7 +145,7 @@ class shuffleLearnModel():
             pred_one_video = []
             for j in range(label_list.get_shape().as_list()[1]):
                 with tf.variable_scope("shuffle_loss", reuse = None if (i == 0 and j == 0) else True):
-                    a = tf.get_variable("a", [Config.feature_size * 3])
+                    a = tf.get_variable("a", [16 * 3])
                 pred_one_video.append(tf.reduce_sum(tf.multiply(a, sample_list[i][j])))
                 tf.stack(pred_one_video, axis = 0)
             predictions.append(pred_one_video)
@@ -160,8 +165,8 @@ class shuffleLearnModel():
         self.input_placeholder = None
        # self.dropout_placeholder = None
         self.add_placeholders(input_features)
-        self.output_feat = self.add_extract_op()
-        sample_list, label_list = self.add_random_combination(self.output_feat, num_frames)
+        self.output_feat_for_shuffle, self.output_feat_for_lstm = self.add_extract_op()
+        sample_list, label_list = self.add_random_combination(self.output_feat_for_shuffle, num_frames)
         self.shuffle_pred, self.loss = self.add_shuffle_loss(sample_list, label_list)
         # self.loss = self.add_shuffle_loss(NONE,sample_list, label_list,-1,NONE)
 
