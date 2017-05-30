@@ -86,7 +86,7 @@ class shuffleLearnModel():
             with tf.variable_scope("fc1", reuse = None if i == 0 else True):
                 activ2_shape = activ2.get_shape().as_list()
                 fc1_input1 = tf.reshape(activ2, [ -1, Config.conv2_output_channel * activ2_shape[1] ])
-		fc1_input1 = self.input_placeholder[:,i,:]
+		#fc1_input1 = self.input_placeholder[:,i,:]
                 fc1_output1 = tf.layers.dense(inputs=fc1_input1, units=1024,kernel_initializer=tf.contrib.layers.xavier_initializer(), activation=tf.nn.sigmoid)
 
             output_list.append(fc1_output1)
