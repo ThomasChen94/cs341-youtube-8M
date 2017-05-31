@@ -45,7 +45,7 @@ class Config:
 
 class shuffleLearnModel():
     def add_placeholders(self, input_features):
-        self.input_placeholder  = input_features * 100
+        self.input_placeholder  = input_features * 1
         #self.dropout_placeholder = tf.placeholder(tf.float32)
         #self.num_frames = tf.placeholder(tf.int32, [None])
 
@@ -64,7 +64,8 @@ class shuffleLearnModel():
             with tf.variable_scope("conv1", reuse = None if i == 0 else True):
                 # the first convolutional layer
                 filter1 = tf.get_variable("f1", [Config.filter1_size, 1, Config.conv1_output_channel])
-                conv1_input = tf.reshape(self.input_placeholder[:,i,:], [-1, Config.feature_size, 1 ])
+                #conv1_input = tf.reshape(self.input_placeholder[:,i,:], [-1, Config.feature_size, 1 ])
+		conv1_input = self.input_placeholder[:,i,:]
                 conv1 = tf.nn.conv1d(conv1_input, filter1, stride = 2, padding= "SAME")
 
                 # pooling
@@ -157,7 +158,7 @@ class shuffleLearnModel():
         #self.shuffle_loss = tf.nn.softmax_cross_entropy_with_logits(logits=predictions, labels=label_list)
 	self.shuffle_loss = tf.nn.sigmoid_cross_entropy_with_logits(logits=predictions, labels=label_list)
 	self.shuffle_loss = tf.reduce_mean(self.shuffle_loss)
-	return sample_list, self.shuffle_loss
+	return predictions, self.shuffle_loss
 
 
     def __init__(self, num_frames, input_features):
