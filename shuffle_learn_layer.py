@@ -165,7 +165,7 @@ class shuffleLearnModel():
                                         [16, 1],
                                         initializer = tf.contrib.layers.xavier_initializer())
                 shuffle_loss_b = tf.get_variable("shuffle_loss_b", [1], initializer = tf.contrib.layers.xavier_initializer())
-                shuffle_loss_output = tf.nn.sigmoid(tf.matmul(fc3_output1, fc3_W) + fc3_b)
+                shuffle_loss_output = tf.nn.sigmoid(tf.matmul(fc3_output1, shuffle_loss_W) + shuffle_loss_b)
 	    shuffle_loss_temp = tf.nn.sigmoid_cross_entropy_with_logits(logits=shuffle_loss_output, labels=label_list)
 	    shuffle_loss_temp = tf.reduce_mean(self.shuffle_loss_temp)
 	    if(i == 0):
