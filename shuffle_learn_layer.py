@@ -64,8 +64,8 @@ class shuffleLearnModel():
             with tf.variable_scope("conv1", reuse = None if i == 0 else True):
                 # the first convolutional layer
                 filter1 = tf.get_variable("f1", [Config.filter1_size, 1, Config.conv1_output_channel])
-                #conv1_input = tf.reshape(self.input_placeholder[:,i,:], [-1, Config.feature_size, 1 ])
-		conv1_input = self.input_placeholder[:,i,:]
+                conv1_input = tf.reshape(self.input_placeholder[:,i,:], [-1, Config.feature_size, 1 ])
+		#conv1_input = self.input_placeholder[:,i,:]
                 conv1 = tf.nn.conv1d(conv1_input, filter1, stride = 2, padding= "SAME")
 
                 # pooling
@@ -86,20 +86,31 @@ class shuffleLearnModel():
                 activ2 = tf.nn.relu(pool2)
 
             with tf.variable_scope("fc1", reuse = None if i == 0 else True):
+		activ2 = tf.transpose(activ2, [0, 2, 1])
                 activ2_shape = activ2.get_shape().as_list()
-                fc1_input1 = tf.reshape(activ2, [ -1, Config.conv2_output_channel * activ2_shape[1] ])
+                fc1_input = tf.reshape(activ2, [ -1, Config.conv2_output_channel * activ2_shape[2] ])
 		#fc1_input1 = self.input_placeholder[:,i,:]
-                fc1_output1 = tf.layers.dense(inputs=fc1_input1, units=1024,kernel_initializer=tf.contrib.layers.xavier_initializer(), activation=tf.nn.sigmoid)
+		fc1_W = tf.get_variable("fc1_W", 
+					[Config.conv2_output_channel * activ2_shape[2], 1024],
+					initializer = tf.contrib.layers.xavier_initializer())
+		fc1_b = tf.get_variable("fc1_b", [1024], initializer = tf.contrib.layers.xavier_initializer())
+		fc1_output1 = tf.nn.relu(tf.matmul(fc1_input, fc1_W) + fc1_b) 
+                #fc1_output1 = tf.layers.dense(inputs=fc1_input1, units=1024,kernel_initializer=tf.contrib.layers.xavier_initializer(), activation=tf.nn.sigmoid)
 	    with tf.variable_scope("fc2", reuse = None if i == 0 else True):
-                fc2_output1 = tf.layers.dense(inputs=fc1_output1, units=16,kernel_initializer=tf.contrib.layers.xavier_initializer(), activation=tf.nn.sigmoid)
+                fc2_W = tf.get_variable("fc2_W",
+                                        [1024, 16],
+                                        initializer = tf.contrib.layers.xavier_initializer())
+                fc2_b = tf.get_variable("fc2_b", [16], initializer = tf.contrib.layers.xavier_initializer())
+		fc2_output1 = tf.nn.relu(tf.matmul(fc1_output1, fc2_W) + fc2_b)
+		#fc2_output1 = tf.layers.dense(inputs=fc1_output1, units=16,kernel_initializer=tf.contrib.layers.xavier_initializer(), activation=tf.nn.sigmoid)
             output_list_for_shuffle.append(fc2_output1)
 	    output_list_for_lstm.append(fc1_output1)
 
         # return the output of the fully connected layer
         output_tensor_for_shuffle = tf.stack(output_list_for_shuffle, axis = 1)
-        output_tensor_for_shuffle = tf.reshape(output_tensor_for_shuffle, [-1, Config.input_length, 16])
+        #output_tensor_for_shuffle = tf.reshape(output_tensor_for_shuffle, [-1, Config.input_length, 16])
         output_tensor_for_lstm = tf.stack(output_list_for_lstm, axis = 1)
-        output_tensor_for_lstm = tf.reshape(output_tensor_for_lstm, [-1, Config.input_length, Config.feature_size])
+       # output_tensor_for_lstm = tf.reshape(output_tensor_for_lstm, [-1, Config.input_length, Config.feature_size])
 	return output_tensor_for_shuffle, output_tensor_for_lstm
 
 
@@ -125,7 +136,9 @@ class shuffleLearnModel():
             for j in range(shuffle_value.shape[0]):
                 shuffle_concat_list.append(tf.concat([shuffle_value[j][0], shuffle_value[j][1], shuffle_value[j][2]],
                                                      axis = 0))
+	    shuffle_concat = tf.stack(shuffle_concat_list, axis = 0)
             sample_list.append(shuffle_concat_list)
+	sample_list = tf.stack(sample_list, axis = 0)
         return sample_list, label_list
 
     #def add_random_pick(self, input_features):
@@ -140,25 +153,26 @@ class shuffleLearnModel():
         It needs further discussion
 
         '''
-            # sample_list_spread = tf.reshape(sample_list, [-1, ]) # mark!!!!!! concatenate use or not
-        predictions = []
-        for i in range(label_list.get_shape().as_list()[0]):
-            pred_one_video = []
-            for j in range(label_list.get_shape().as_list()[1]):
-                with tf.variable_scope("shuffle_loss", reuse = None if (i == 0 and j == 0) else True):
-                    a = tf.get_variable("a", [16 * 3])
-                pred_one_video.append(tf.reduce_sum(tf.multiply(a, sample_list[i][j])))
-                tf.stack(pred_one_video, axis = 0)
-            predictions.append(pred_one_video)
-        tf.stack(predictions, axis = 0)
-
-        # to get sample_list_spread
-
-	#predictions = tf.Variable(sample_list, name='shuffle_pred')
-        #self.shuffle_loss = tf.nn.softmax_cross_entropy_with_logits(logits=predictions, labels=label_list)
-	self.shuffle_loss = tf.nn.sigmoid_cross_entropy_with_logits(logits=predictions, labels=label_list)
-	self.shuffle_loss = tf.reduce_mean(self.shuffle_loss)
-	return predictions, self.shuffle_loss
+	for i in range(sample_list.shape[1]):
+	    with tf.variable_scope("fc3", reuse = None  if i == 0 else True):
+                fc3_W = tf.get_variable("fc3_W",
+                                        [48, 16],
+                                        initializer = tf.contrib.layers.xavier_initializer())
+                fc3_b = tf.get_variable("fc3_b", [16], initializer = tf.contrib.layers.xavier_initializer())
+                fc3_output1 = tf.nn.relu(tf.matmul(sample_list[:,i,:], fc3_W) + fc3_b)
+	    with tf.variable_scope("shuffle_loss", reuse = None  if i == 0 else True):
+                shuffle_loss_W = tf.get_variable("shuffle_loss_W",
+                                        [16, 1],
+                                        initializer = tf.contrib.layers.xavier_initializer())
+                shuffle_loss_b = tf.get_variable("shuffle_loss_b", [1], initializer = tf.contrib.layers.xavier_initializer())
+                shuffle_loss_output = tf.nn.sigmoid(tf.matmul(fc3_output1, fc3_W) + fc3_b)
+	    shuffle_loss_temp = tf.nn.sigmoid_cross_entropy_with_logits(logits=shuffle_loss_output, labels=label_list)
+	    shuffle_loss_temp = tf.reduce_mean(self.shuffle_loss_temp)
+	    if(i == 0):
+		self.shuffle_loss = shuffle_loss_temp
+	    else:
+	    	self.shuffle_loss = self.shuffle_loss + shuffle_loss_temp
+	return shuffle_loss_output, self.shuffle_loss
 
 
     def __init__(self, num_frames, input_features):
