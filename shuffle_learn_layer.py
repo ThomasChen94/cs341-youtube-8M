@@ -153,6 +153,7 @@ class shuffleLearnModel():
         It needs further discussion
 
         '''
+	shuffle_loss_list = []
 	for i in range(sample_list.shape[1]):
 	    with tf.variable_scope("fc3", reuse = None  if i == 0 else True):
                 fc3_W = tf.get_variable("fc3_W",
@@ -166,12 +167,11 @@ class shuffleLearnModel():
                                         initializer = tf.contrib.layers.xavier_initializer())
                 shuffle_loss_b = tf.get_variable("shuffle_loss_b", [1], initializer = tf.contrib.layers.xavier_initializer())
                 shuffle_loss_output = tf.nn.sigmoid(tf.matmul(fc3_output1, shuffle_loss_W) + shuffle_loss_b)
-	    shuffle_loss_temp = tf.nn.sigmoid_cross_entropy_with_logits(logits=shuffle_loss_output, labels=label_list)
-	    shuffle_loss_temp = tf.reduce_mean(self.shuffle_loss_temp)
-	    if(i == 0):
-		self.shuffle_loss = shuffle_loss_temp
-	    else:
-	    	self.shuffle_loss = self.shuffle_loss + shuffle_loss_temp
+	    label_current = tf.reshape(label_list[:,i], [-1, 1])
+	    shuffle_loss_temp = tf.nn.sigmoid_cross_entropy_with_logits(logits=shuffle_loss_output, labels=label_current)
+	    shuffle_loss_temp = tf.reduce_mean(shuffle_loss_temp)
+	    shuffle_loss_list.append(shuffle_loss_temp)
+	self.shuffle_loss = tf.reduce_mean(tf.stack(shuffle_loss_list, axis = 0))
 	return shuffle_loss_output, self.shuffle_loss
 
 
