@@ -313,9 +313,9 @@ def build_graph(reader,
           tower_label_losses.append(label_loss)
 
           # Incorporate the L2 weight penalties etc.
-	  shuffle_penalty = 0.1  # set the portion of shuffle loss
-          #final_loss = shuffle_penalty * shuffle_loss +  regularization_penalty * reg_loss + label_loss
-          final_loss = shuffle_loss
+	  shuffle_penalty = 0  # set the portion of shuffle loss
+          final_loss = shuffle_penalty * shuffle_loss +  regularization_penalty * reg_loss + label_loss
+          #final_loss = shuffle_loss
 	  gradients = optimizer.compute_gradients(final_loss,
               colocate_gradients_with_ops=False)
           tower_gradients.append(gradients)

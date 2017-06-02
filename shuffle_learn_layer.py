@@ -25,12 +25,12 @@ class Config:
 
     # parameters for the first layer
     filter1_size = 5
-    conv1_output_channel = 32
+    conv1_output_channel = 16
     pool1_length = 5
 
     # parameters for the second layer
     filter2_size = 3
-    conv2_output_channel = 8
+    conv2_output_channel = 6
     pool2_length = 3
 
     feature_size = 1024
@@ -72,7 +72,7 @@ class shuffleLearnModel():
                 pool1 = tf.nn.pool(conv1, [Config.pool1_length], "MAX", "SAME")
 
                 # activate
-                activ1 = tf.nn.relu(pool1)
+                activ1 = tf.nn.relu(conv1)
 
             with tf.variable_scope("conv2", reuse = None if i == 0 else True):
                 # the first convolutional layer
@@ -83,7 +83,7 @@ class shuffleLearnModel():
                 pool2 = tf.nn.pool(conv2, [Config.pool2_length], "MAX", "SAME")
 
                 # activate
-                activ2 = tf.nn.relu(pool2)
+                activ2 = tf.nn.relu(conv2)
 
             with tf.variable_scope("fc1", reuse = None if i == 0 else True):
 		activ2 = tf.transpose(activ2, [0, 2, 1])
@@ -126,7 +126,7 @@ class shuffleLearnModel():
         sample_list = []
         #label_list = tf.convert_to_tensor(label_list)
         video_num = 1
-        label_list = tf.constant(label_list, dtype = tf.float32, shape = [video_num ,Config.num_shuffle_sample * 6])
+        label_list = tf.constant(label_list, dtype = tf.float32, shape = [video_num ,Config.num_shuffle_sample * 2])
         for i in range(video_num):
             # loop over the batch_size
             #shuffle_index = tf.convert_to_tensor(shuffle_list[i])
@@ -137,7 +137,7 @@ class shuffleLearnModel():
                 shuffle_concat_list.append(tf.concat([shuffle_value[j][0], shuffle_value[j][1], shuffle_value[j][2]],
                                                      axis = 0))
 	    shuffle_concat = tf.stack(shuffle_concat_list, axis = 0)
-            sample_list.append(shuffle_concat_list)
+            sample_list.append(shuffle_concat)
 	sample_list = tf.stack(sample_list, axis = 0)
         return sample_list, label_list
 

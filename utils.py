@@ -235,10 +235,11 @@ def random_pick_3(num_frames, num_tuples, batch_size):
                 mid = num_frames[i] / 2
             low  = np.random.randint(0, mid)
             high = np.random.randint(mid + 1, num_frames[i])
-	    low = 10
-	    mid = 20
-	    high = 30
-            pick_some.extend(list(itertools.permutations([low, mid, high],3)))
+	    #low = 18
+	    #mid = 20
+	    #high = 22
+           # pick_some.extend(list(itertools.permutations([low, mid, high],3)))
+	    pick_some.extend([[low, mid, high], [high, low, mid]])
         random.shuffle(pick_some)
         pick_some = np.asarray(pick_some)
         pick_res.append(pick_some)
